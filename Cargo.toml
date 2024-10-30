@@ -34,28 +34,28 @@ naga_oil = { version = "0.14.0", default-features = false, features = [
 ] }
 
 [dependencies.bevy]
-version = "0.14.1"
+version = "0.14.2"
 default-features = false
 # See https://github.com/bevyengine/bevy/blob/main/docs/cargo_features.md
 features = [
-  "bevy_core_pipeline",
+    "bevy_core_pipeline",
 
-  # TODO: is this inherited by downstream users? If so, then we probably don't need it
-  "multi_threaded",
+    # TODO: is this inherited by downstream users? If so, then we probably don't need it
+    "multi_threaded",
 ]
 
 [dev-dependencies]
 rand = ">=0.8.5"
 
 [dev-dependencies.bevy]
-version = "0.14.1"
+version = "0.14.2"
 default-features = false
 features = [
-  "bevy_sprite",
-  "bevy_core_pipeline",
-  "multi_threaded",
-  "sysinfo_plugin",
-  "x11",
+    "bevy_sprite",
+    "bevy_core_pipeline",
+    "multi_threaded",
+    "sysinfo_plugin",
+    "x11",
 ]
 
 [[example]]
@@ -69,3 +69,6 @@ name = "one_shot"
 
 [[example]]
 name = "boids"
+
+[[example]]
+name = "supersimplex"
