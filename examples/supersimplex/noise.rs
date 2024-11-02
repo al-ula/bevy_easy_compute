@@ -21,9 +21,9 @@ impl ComputeWorker for SuperSimplexComputeWorker {
 
         // Calculate workgroup count to cover the entire target size
         let workgroup_size = 8; // Keep 8x8x8 workgroup size
-        let workgroup_count_x = (TARGET_WIDTH as usize + workgroup_size - 1) / workgroup_size;
-        let workgroup_count_y = (TARGET_HEIGHT as usize + workgroup_size - 1) / workgroup_size;
-        let workgroup_count_z = (1usize + workgroup_size - 1) / workgroup_size;
+        let workgroup_count_x = (TARGET_WIDTH as usize).div_ceil(workgroup_size);
+        let workgroup_count_y = (TARGET_HEIGHT as usize).div_ceil(workgroup_size);
+        let workgroup_count_z = 1usize.div_ceil(workgroup_size);
 
         AppComputeWorkerBuilder::new(world)
             .add_uniform("seed", &12335.0f32)
