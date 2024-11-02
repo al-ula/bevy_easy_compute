@@ -5,7 +5,6 @@ use std::time::SystemTime;
 
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
-use bevy::tasks::{ComputeTaskPool, ParallelSliceMut};
 use bevy::window::{WindowPlugin, WindowResolution};
 use bevy_easy_compute::prelude::*;
 use noise::*;
