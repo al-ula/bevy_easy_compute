@@ -1,6 +1,6 @@
 [package]
 name = "bevy_easy_compute"
-version = "0.14.1"
+version = "0.14.2"
 authors = [
     "Cornchip <cornchipgonecodin@gmail.com>",
     "Kjolnyr <kjolnyr@protonmail.com>",
@@ -32,6 +32,7 @@ naga = { version = "0.20.0", features = ["wgsl-in"] }
 naga_oil = { version = "0.14.0", default-features = false, features = [
     "test_shader",
 ] }
+rayon = "1.10.0"
 
 [dependencies.bevy]
 version = "0.14.2"

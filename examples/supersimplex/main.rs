@@ -104,7 +104,7 @@ fn generate_noise_image(
         .unwrap()
         .as_millis() as f32
         / 10.0;
-    info!("z: {}", z);
+    // info!("z: {}", z);
     let unix_epoch = std::time::UNIX_EPOCH;
     let seed = STARTUP_TIME
         .get()
@@ -118,21 +118,12 @@ fn generate_noise_image(
 
     // Generate noise values
     generate_noise(&mut compute_worker, seed, start, target);
-    let noise_values: Vec<f32> = noise_res.data.clone();
 
-    let mut texture_data = vec![0u8; width * height * 4];
-    // Convert noise values to RGBA pixels
-    for (i, noise_value) in noise_values.iter().enumerate() {
-        // Map noise value from [-1,1] to [0,255] for pixel intensity
-        let pixel_intensity = ((noise_value + 1.0) / 2.0 * 255.0) as u8;
-
-        let pixel_start = i * 4;
-        // Set RGB channels to the same intensity for grayscale
-        texture_data[pixel_start] = pixel_intensity; // Red
-        texture_data[pixel_start + 1] = pixel_intensity; // Green
-        texture_data[pixel_start + 2] = pixel_intensity; // Blue
-        texture_data[pixel_start + 3] = 255; // Alpha (fully opaque)
-    }
+    let noise_texture: Vec<u8> = if noise_res.data.is_empty() {
+        vec![0; width * height * 4] // Create black RGBA texture if empty
+    } else {
+        noise_res.data.clone()
+    };
 
     Image::new_fill(
         bevy::render::render_resource::Extent3d {
@@ -141,7 +132,7 @@ fn generate_noise_image(
             depth_or_array_layers: 1,
         },
         bevy::render::render_resource::TextureDimension::D2,
-        &texture_data,
+        &noise_texture,
         bevy::render::render_resource::TextureFormat::Rgba8UnormSrgb,
         Default::default(),
     )
@@ -155,7 +146,6 @@ fn update_texture(
 ) {
     let value = generate_noise_image(compute_worker, &noise_res);
     for (_entity, mut is_generating, mut texture_handle) in query.iter_mut() {
-        let start = SystemTime::now();
         let textureimage = value.clone();
         let asset = assets.add(textureimage);
 
@@ -172,7 +162,5 @@ fn update_texture(
 
         // Set back to not generating
         is_generating.0 = false;
-        let time = start.elapsed().unwrap();
-        info!("Generated texture in {:?}", time);
     }
 }

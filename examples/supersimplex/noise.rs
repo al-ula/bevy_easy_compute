@@ -7,7 +7,7 @@ struct SimpleShader;
 
 impl ComputeShader for SimpleShader {
     fn shader() -> ShaderRef {
-        "shaders/OpenSimplex2SVRange.wgsl".into()
+        "shaders/OpenSimplex2SVRangeRGBA.wgsl".into()
     }
 }
 
@@ -16,8 +16,8 @@ pub struct SuperSimplexComputeWorker;
 
 impl ComputeWorker for SuperSimplexComputeWorker {
     fn build(world: &mut World) -> AppComputeWorker<Self> {
-        let buffer_size = TARGET_WIDTH as usize * TARGET_HEIGHT as usize;
-        let initial_output: Vec<f32> = vec![0.0; buffer_size];
+        let buffer_size = TARGET_WIDTH as usize * TARGET_HEIGHT as usize * 4;
+        let initial_output: Vec<u32> = vec![0u32; buffer_size];
 
         // Calculate workgroup count to cover the entire target size
         let workgroup_size = 8; // Keep 8x8x8 workgroup size
@@ -74,7 +74,7 @@ impl Plugin for NoisePlugin {
 
 #[derive(Resource, Default)]
 pub struct NoiseResource {
-    pub data: Vec<f32>,
+    pub data: Vec<u8>,
 }
 
 #[derive(Default)]
@@ -112,7 +112,9 @@ pub fn update_resource(
         return;
     };
 
-    let result: Vec<f32> = compute_worker.read_vec("output");
+    let result: Vec<u32> = compute_worker.read_vec("output");
+    // Convert u32 to u8 safely
+    let result: Vec<u8> = result.into_iter().map(|x| x as u8).collect();
 
     noise_res.data = result;
 }

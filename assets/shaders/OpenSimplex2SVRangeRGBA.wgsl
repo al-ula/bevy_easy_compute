@@ -83,6 +83,14 @@ fn generateNoise(position: vec3<f32>, frequency: f32, lacunarity: f32, persisten
 				}
 				return totalValue;
 }
+
+fn toRGBA(value: f32) -> vec4<u32> {
+    let clamped = clamp(value, -1.0, 1.0);  // Ensure value is in [-1, 1]
+    let intensity_f32 = ((clamped + 1.0) / 2.0) * 255.0;
+    let intensity = u32(intensity_f32);
+    return vec4<u32>(intensity, intensity, intensity, 255);
+}
+
 @group(0) @binding(0) var<uniform> seed: f32;
 @group(0) @binding(1) var<uniform> start: vec3<f32>;
 @group(0) @binding(2) var<uniform> next: vec3<f32>;
@@ -92,7 +100,7 @@ fn generateNoise(position: vec3<f32>, frequency: f32, lacunarity: f32, persisten
 @group(0) @binding(6) var<uniform> octaves: u32;
 @group(0) @binding(7) var<uniform> useConventional: u32;
 @group(0) @binding(8) var<uniform> target_dims: vec3<u32>;
-@group(0) @binding(9) var<storage, read_write> output: array<f32>;
+@group(0) @binding(9) var<storage, read_write> output: array<u32>;
 
 @compute @workgroup_size(8, 8, 1)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
@@ -114,9 +122,13 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let position_webgpu = mix(start_webgpu, next_webgpu, t);
 
     // Calculate index in the output array
-    let index = id.x + id.y * target_dims.x + id.z * target_dims.x * target_dims.y;
-
-    output[index] = (generateNoise(position_webgpu, frequency, lacunarity, persistence, octaves, useConventional, seed) + 1.0) / 2.0;
+    let base_index = (id.x + id.y * target_dims.x + id.z * target_dims.x * target_dims.y) * 4;
+    let value = generateNoise(position_webgpu, frequency, lacunarity, persistence, octaves, useConventional, seed);
+    let rgba = toRGBA(value);
+    output[base_index] = rgba.x;
+    output[base_index + 1] = rgba.y;
+    output[base_index + 2] = rgba.z;
+    output[base_index + 3] = rgba.w;
 }
 
 //////////////////////////////// End noise code ////////////////////////////////
